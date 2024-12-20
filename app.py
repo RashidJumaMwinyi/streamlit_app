@@ -5,6 +5,9 @@ import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
 
+# Define image dimensions (make sure this matches your model's input size)
+IMG_DIMS = (128, 128)  # Adjust this based on your model's expected input size
+
 def predict_image_class(image_data, model, w=128, h=128):
     size = (w, h)
     image = ImageOps.fit(image_data, size, Image.LANCZOS)
@@ -52,23 +55,12 @@ else:
     st.image(image, use_container_width=False)
     predictions = predict_image_class(image, model)
 
-    # Assuming your model outputs probabilities for 2 classes (tumor, no tumor)
-    if predictions.shape[1] == 1:  # Binary classification
-        predicted_class = (predictions[0][0] > 0.5).astype(int)  # Thresholding for binary classification
-        class_labels = ['No Tumor', 'Tumor']
-    else:
-        # Handle multi-class case if applicable
-        predicted_class = np.argmax(predictions, axis=1)[0]
-        class_labels = ['Class 1', 'Class 2', 'Class 3', 'Class 4']  # Adjust based on your model
+    # Assuming your model outputs probabilities for 4 classes
+    predicted_class = np.argmax(predictions, axis=1)[0]  # Get the index of the highest probability
+    class_labels = ['glioma', 'meningioma', 'notumor', 'pituitary']  # Class labels
 
     string = "Detected class: " + class_labels[predicted_class]
 
-    if predicted_class == 1:  # Assuming 1 corresponds to 'Tumor'
-        st.balloons()
-        st.sidebar.success(string)
-        st.write("""
-        # Tumor Detected! 🧠
-        """)
-    else:
-        st.sidebar.warning(string)
-        st.markdown("## No Tumor Detected")
+    # Display the result
+    st.sidebar.success(string)
+    st.write(f"## Detected Class: {class_labels[predicted_class]}")
