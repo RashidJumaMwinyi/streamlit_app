@@ -68,7 +68,7 @@ if class_labels[predicted_class] == 'notumor':
         st.sidebar.info(string)  # Use info for 'notumor'
         st.write(f"## Detected Class: {class_labels[predicted_class]}")
         st.success("No tumor detected. The MRI appears normal.")
-    else:
-        st.sidebar.error(string)  # Use error for tumor cases
-        st.write(f"## Detected Class: {class_labels[predicted_class]}")
-        st.warning("Tumor detected! Please consult a medical professional for further evaluation.")
+else:
+    st.sidebar.error(string)  # Use error for tumor cases
+    st.write(f"## Detected Class: {class_labels[predicted_class]}")
+    st.warning("Tumor detected! Please consult a medical professional for further evaluation.")
