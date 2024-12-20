@@ -10,8 +10,7 @@ def predict_image_class(image_data, model, w=128, h=128):
     image = ImageOps.fit(image_data, size, Image.LANCZOS)
     img = np.asarray(image)
     if len(img.shape) > 2 and img.shape[2] == 4:
-        # Slice off the alpha channel if it exists
-        img = img[:, :, :3]
+        img = img[:, :, :3]  # Slice off the alpha channel if it exists
     img = np.expand_dims(img, axis=0)  # for models expecting a batch
     prediction = model.predict(img)
     return prediction
@@ -23,50 +22,53 @@ def load_model():
 
 st.set_page_config(
     page_title="Brain Tumor Detector",
-    page_icon=":Brain Tumor:",
+    page_icon="🧠",
     initial_sidebar_state='auto'
 )
 
 with st.sidebar:
     st.title("Brain Tumor Detection Model")
-    st.subheader("Description of what your model is doing.")
+    st.subheader("This model detects the presence of brain tumors in MRI images.")
 
 st.write("""
          # Brain Tumor Detection Tool
          """
          )
 
-img_file = st.file_uploader("", type=["jpg", "png"])
+img_file = st.file_uploader("Upload MRI Image", type=["jpg", "png"])
 
-# Check if the model file exists, if not, download it
-if 'my_model.keras' not in os.listdir():
+model_file = 'my_model.keras'
+if not os.path.exists(model_file):
     with st.spinner('Model is being downloaded...'):
-        # Use the file ID from your Google Drive link
-        gdown.download(id='1ehLrhvVLb0a7QdGUQk5VGuQfneUVkXQo', output='my_model.keras', quiet=False)
+        gdown.download(f'https://drive.google.com/uc?id=1ehLrhvVLb0a7QdGUQk5VGuQfneUVkXQo', output=model_file, quiet=False)
 
 with st.spinner('Model is being loaded...'):
     model = load_model()
 
 if img_file is None:
-    st.text("Please upload an image file")
+    st.text("Please upload an MRI image file.")
 else:
     image = Image.open(img_file)
     st.image(image, use_container_width=False)
     predictions = predict_image_class(image, model)
 
-    # Decode predictions
-    top5_preds = tf.keras.applications.imagenet_utils.decode_predictions(predictions, top=5)
-    st.info(top5_preds[0])
-    top_pred = top5_preds[0][0][1]
+    # Assuming your model outputs probabilities for 2 classes (tumor, no tumor)
+    if predictions.shape[1] == 1:  # Binary classification
+        predicted_class = (predictions[0][0] > 0.5).astype(int)  # Thresholding for binary classification
+        class_labels = ['No Tumor', 'Tumor']
+    else:
+        # Handle multi-class case if applicable
+        predicted_class = np.argmax(predictions, axis=1)[0]
+        class_labels = ['Class 1', 'Class 2', 'Class 3', 'Class 4']  # Adjust based on your model
 
-    string = "Detected class: " + top_pred
+    string = "Detected class: " + class_labels[predicted_class]
 
-    if 'Brain Tumor' in top_pred.lower() or top_pred.lower() == 'tabby':
+    if predicted_class == 1:  # Assuming 1 corresponds to 'Tumor'
         st.balloons()
         st.sidebar.success(string)
         st.write("""
-        # C A T""")
+        # Tumor Detected! 🧠
+        """)
     else:
         st.sidebar.warning(string)
-        st.markdown("## Issue detected:")
-        st.info("Not a Brain Tumor.")
+        st.markdown("## No Tumor Detected")
