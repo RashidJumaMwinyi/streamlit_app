@@ -5,7 +5,6 @@ import tensorflow as tf
 from PIL import Image, ImageOps
 import numpy as np
 
-
 def predict_image_class(image_data, model, w=128, h=128):
     size = (w, h)
     image = ImageOps.fit(image_data, size, Image.LANCZOS)
@@ -59,16 +58,12 @@ else:
 
     string = "Detected class: " + class_labels[predicted_class]
 
- predicted_class = np.argmax(predictions, axis=1)[0]  # Get the index of the highest probability
-    class_labels = ['glioma', 'meningioma', 'notumor', 'pituitary']  # Class labels
-
-    string = "Detected class: " + class_labels[predicted_class]
-
-if class_labels[predicted_class] == 'notumor':
+    # Display the result with different colors based on the detected class
+    if class_labels[predicted_class] == 'notumor':
         st.sidebar.info(string)  # Use info for 'notumor'
         st.write(f"## Detected Class: {class_labels[predicted_class]}")
         st.success("No tumor detected. The MRI appears normal.")
-else:
-    st.sidebar.error(string)  # Use error for tumor cases
-    st.write(f"## Detected Class: {class_labels[predicted_class]}")
-    st.warning("Tumor detected! Please consult a medical professional for further evaluation.")
+    else:
+        st.sidebar.error(string)  # Use error for tumor cases
+        st.write(f"## Detected Class: {class_labels[predicted_class]}")
+        st.warning("Tumor detected! Please consult a medical professional for further evaluation.")
