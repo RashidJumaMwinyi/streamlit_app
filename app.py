@@ -46,11 +46,11 @@ with st.spinner('Model is being loaded...'):
     model = load_model()
 
 if img_file is None:
-    # st.text("Please upload an MRI image file.")
+    st.text("Please upload an MRI image file.")
      # Add a link to download the dataset
-    st.markdown(
-        "If you don't have an MRI image to test, you can download the dataset from [here](https://drive.google.com/drive/folders/1sBfPzjdDLOup-whgQliKOhFa-adjKyiX?usp=sharing)."
-    )
+    # st.markdown(
+    #     "If you don't have an MRI image to test, you can download the dataset from [here](https://drive.google.com/drive/folders/1sBfPzjdDLOup-whgQliKOhFa-adjKyiX?usp=sharing)."
+    # )
 else:
     image = Image.open(img_file)
     st.image(image, use_container_width=False)
