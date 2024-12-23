@@ -57,7 +57,12 @@ else:
     class_labels = ['glioma', 'meningioma', 'notumor', 'pituitary']  # Class labels
 
     string = "Detected class: " + class_labels[predicted_class]
-
+    
+     # Add a link to download the dataset
+    st.markdown(
+        "If you don't have an MRI image to test, you can download the dataset from [here](https://drive.google.com/drive/folders/1sBfPzjdDLOup-whgQliKOhFa-adjKyiX?usp=sharing)."
+    )
+    
     # Display the result with different colors based on the detected class
     if class_labels[predicted_class] == 'notumor':
         st.sidebar.info(string)  # Use info for 'notumor'
