@@ -6,14 +6,23 @@ from PIL import Image, ImageOps
 import numpy as np
 
 def predict_image_class(image_data, model, w=128, h=128):
-    size = (w, h)
-    image = ImageOps.fit(image_data, size, Image.LANCZOS)
-    img = np.asarray(image)
-    if len(img.shape) > 2 and img.shape[2] == 4:
-        img = img[:, :, :3]  # Slice off the alpha channel if it exists
-    img = np.expand_dims(img, axis=0)  # for models expecting a batch
-    prediction = model.predict(img)
-    return prediction
+    try:
+        size = (w, h)
+        image = ImageOps.fit(image_data, size, Image.LANCZOS)
+        img = np.asarray(image)
+        
+        if len(img.shape) > 2 and img.shape[2] == 4:
+            img = img[:, :, :3]  # Slice off the alpha channel if it exists
+        
+        img = img.astype('float32') / 255.0  # Normalize the image to [0, 1]
+        img = np.expand_dims(img, axis=0)  # for models expecting a batch
+        
+        prediction = model.predict(img)
+        return prediction
+    
+    except Exception as e:
+        print(f"Error during prediction: {e}")
+        return None
 
 @st.cache_resource
 def load_model():
